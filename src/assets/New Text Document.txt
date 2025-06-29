@@ -1,0 +1,4 @@
+ref_id,name,value
+101,Alpha,10.5
+102,Beta,20
+103,Gamma,30
