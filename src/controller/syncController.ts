@@ -7,7 +7,7 @@ export class SyncController {
 
   @Post()
   async triggerSync() {
-    const zipPath = '..src/assets/sample.zip';
+    const zipPath = 'src/assets/sample.zip';
   const result = await this.syncService.syncFromZip(zipPath);
     return { message: 'CSV sync complete',
        ...result
