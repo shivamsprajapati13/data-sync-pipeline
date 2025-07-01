@@ -46,15 +46,88 @@ CREATE TABLE cur_data (
 CREATE INDEX idx_cur_data_ref_id ON cur_data(ref_id);
 ```
 
+
+### 4. Environment Configuration
+Create a .env file:
+```
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=your_postgres_user
+DB_PASSWORD=your_postgres_password
+DB_NAME=csv_sync
+```
+
 ### ▶️ Running the Application
 ```
 pnpm run start:dev
 ```
+---
+
+
+### 🕹️ Cron Job API: Start and Stop Sync Job
+You can dynamically start or stop the scheduled CSV sync job using the following API endpoints. These endpoints give you programmatic control over the cron job from tools like curl, Postman, or a frontend app.
+
+### ▶️ POST /cron/start – Start the Sync Job
+Starts a cron job that will run every 15 or 30 seconds (as configured) and perform CSV data sync from the ZIP file.
+
+✅ Example Curl Command
+```
+curl --location --request POST 'http://localhost:3000/cron/start'
+```
+✅ Sample Response
+```
+{
+    "message": "Cron started"
+}
+```
+
+
+### ⏹️ POST /cron/stop – Stop the Sync Job
+Stops the running cron job and prevents further automatic CSV sync execution.
+
+✅ Example Curl Command
+```
+curl --location --request POST 'http://localhost:3000/cron/stopt'
+```
+✅ Sample Response
+```
+{
+    "message": "Cron stopped"
+}
+```
+⚠️ If no job is running, the system will log a warning.
+
+
+### ⏱ Automated Sync via Cron Job
+
+### Output
+```
+[Nest] 1928  - 07/01/2025, 10:14:45 PM     LOG [cronService] Running weekly cron job
+[Nest] 1928  - 07/01/2025, 10:14:45 PM     LOG [cronService] Sync Result: {"inserted":[],"updated":[],"deleted":[]}
+[Nest] 1928  - 07/01/2025, 10:15:00 PM     LOG [cronService] Running weekly cron job
+[Nest] 1928  - 07/01/2025, 10:15:00 PM     LOG [cronService] Sync Result: {"inserted":[],"updated":[],"deleted":[]}
+[Nest] 1928  - 07/01/2025, 10:15:15 PM     LOG [cronService] Running weekly cron job
+[Nest] 1928  - 07/01/2025, 10:15:15 PM     LOG [cronService] Sync Result: {"inserted":[],"updated":[],"deleted":[]}
+[Nest] 1928  - 07/01/2025, 10:15:30 PM     LOG [cronService] Running weekly cron job
+[Nest] 1928  - 07/01/2025, 10:15:41 PM     LOG [cronService] Sync Result: {"inserted":[{"refId":"5","name":"demo","value":985,"id":7,"lastUpdated":"2025-07-01T16:45:41.842Z"}],"updated":[],"deleted":[]}
+
+```
+
+---
+
+### 🧠 How It Works
+- The CronService uses SchedulerRegistry from @nestjs/schedule to manage jobs programmatically.
+
+- start() registers and starts a cron job named syncJob.
+
+- stop() stops and removes syncJob from memory.
+
+- This approach provides full runtime control over your scheduled sync without restarting the server
+
 
 ### 📥 Manual Sync via API
 An optional endpoint exists to trigger sync manually:
 
-POST /sync
 ```
 curl --location --request POST 'http://localhost:3000/sync' \
 --data ''
@@ -86,27 +159,6 @@ curl --location --request POST 'http://localhost:3000/sync' \
 4. Applies necessary inserts/updates/deletes
 ```
 
-### ⏱ Automated Sync via Cron Job
-The app includes an internal cron job using @nestjs/schedule.
-```
-@Cron('*/30 * * * * *') // every 30 seconds
-async handleCron() {
-  await this.syncService.syncFromZip('src/assets/sample.zip');
-}
-```
-
-### Output
-```
-[Nest] 1928  - 07/01/2025, 10:14:45 PM     LOG [cronService] Running weekly cron job
-[Nest] 1928  - 07/01/2025, 10:14:45 PM     LOG [cronService] Sync Result: {"inserted":[],"updated":[],"deleted":[]}
-[Nest] 1928  - 07/01/2025, 10:15:00 PM     LOG [cronService] Running weekly cron job
-[Nest] 1928  - 07/01/2025, 10:15:00 PM     LOG [cronService] Sync Result: {"inserted":[],"updated":[],"deleted":[]}
-[Nest] 1928  - 07/01/2025, 10:15:15 PM     LOG [cronService] Running weekly cron job
-[Nest] 1928  - 07/01/2025, 10:15:15 PM     LOG [cronService] Sync Result: {"inserted":[],"updated":[],"deleted":[]}
-[Nest] 1928  - 07/01/2025, 10:15:30 PM     LOG [cronService] Running weekly cron job
-[Nest] 1928  - 07/01/2025, 10:15:41 PM     LOG [cronService] Sync Result: {"inserted":[{"refId":"5","name":"demo","value":985,"id":7,"lastUpdated":"2025-07-01T16:45:41.842Z"}],"updated":[],"deleted":[]}
-
-```
 ### 🧪 Test Checklist
 ```
 ✅ Place sample.zip in src/assets/
