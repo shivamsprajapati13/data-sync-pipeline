@@ -106,11 +106,15 @@ async handleCron() {
 [Nest] 1928  - 07/01/2025, 10:15:30 PM     LOG [cronService] Running weekly cron job
 [Nest] 1928  - 07/01/2025, 10:15:41 PM     LOG [cronService] Sync Result: {"inserted":[{"refId":"5","name":"demo","value":985,"id":7,"lastUpdated":"2025-07-01T16:45:41.842Z"}],"updated":[],"deleted":[]}
 
+```
 ### 🧪 Test Checklist
 ```
 ✅ Place sample.zip in src/assets/
+
 ✅ Ensure the CSV inside has a ref_id column
+
 ✅ PostgreSQL is running and schema is created
+
 ✅ dist/assets/ directory exists
 ```
 
